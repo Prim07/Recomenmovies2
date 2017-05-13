@@ -14,20 +14,29 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 
-using Excel = Microsoft.Office.Interop.Excel;
+//using Excel = Microsoft.Office.Interop.Excel;
 
 namespace Recomenmovies2
 {
     public partial class MainWindow : Window
     {
 
-        //zmienne potrzebne do załadowania Excela
-        Excel.Application myApp;
+        /*//zmienne potrzebne do załadowania Excela
+        /Excel.Application myApp;
         Excel.Workbook myWorkBook;
         Excel.Worksheet myWorkSheet;
         Excel.Range myRange;
         int rows;
-        int cols;
+        int cols;*/
+
+        List<int> ListOfYears = new List<int>();
+        List<string> ListOfTitles = new List<string>();
+        List<string> ListOfGenres = new List<string>();
+        List<string> ListOfCountries = new List<string>();
+        List<string> ListOfLanguages = new List<string>();
+        List<int> ListOfDurations = new List<int>();
+        List<double> ListOfRatings = new List<double>();
+        List<double> ListOfPopularity = new List<double>();
 
         int YearFrom;
         int YearTo;
@@ -101,14 +110,69 @@ namespace Recomenmovies2
         private void OnClickStart(object sender, RoutedEventArgs e)
         {
             //Zanim cokolwiek zrobisz musisz dać to Click w Start bo to ładuje Excela z danymi
-            start.Background = Brushes.White;
-            myApp = new Excel.Application();
-            //TUTAJ zmien sobie ścieżkę 
-            myWorkBook = myApp.Workbooks.Open(@"C:\temp\dane.xlsx", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-            myWorkSheet = (Excel.Worksheet)myWorkBook.Worksheets.get_Item(1);
-            myRange = myWorkSheet.UsedRange;
-            rows = myRange.Rows.Count;
-            cols = myRange.Columns.Count;
+            /* myApp = new Excel.Application();
+             //TUTAJ zmien sobie ścieżkę 
+             myWorkBook = myApp.Workbooks.Open(@"C:\temp\dane.xlsx", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+             myWorkSheet = (Excel.Worksheet)myWorkBook.Worksheets.get_Item(1);
+             myRange = myWorkSheet.UsedRange;
+             rows = myRange.Rows.Count;
+             cols = myRange.Columns.Count;*/
+
+            string line;
+            System.IO.StreamReader countriy_file = new System.IO.StreamReader("country.txt");
+            while ((line = countriy_file.ReadLine()) != null)
+                ListOfCountries.Add(line);
+            countriy_file.Close();
+
+
+            System.IO.StreamReader title_file = new System.IO.StreamReader("title.txt");
+            while ((line = title_file.ReadLine()) != null)
+                ListOfTitles.Add(line);
+            title_file.Close();
+
+
+            System.IO.StreamReader genre_file = new System.IO.StreamReader("genre.txt");
+            while ((line = genre_file.ReadLine()) != null)
+                ListOfGenres.Add(line);
+            genre_file.Close();
+
+
+            System.IO.StreamReader lan_file = new System.IO.StreamReader("language.txt");
+            while ((line = lan_file.ReadLine()) != null)
+                ListOfLanguages.Add(line);
+            lan_file.Close();
+
+
+
+            int x;
+            System.IO.StreamReader year_file = new System.IO.StreamReader("year.txt");
+            while ((line = year_file.ReadLine()) != null)
+            {
+                Int32.TryParse(line, out x);
+                ListOfYears.Add(x);
+            }
+            year_file.Close();
+
+
+            System.IO.StreamReader dur_file = new System.IO.StreamReader("duration.txt");
+            while ((line = dur_file.ReadLine()) != null)
+            {
+                Int32.TryParse(line, out x);
+                ListOfDurations.Add(x);
+            }
+            dur_file.Close();
+
+
+            System.IO.StreamReader rating_file = new System.IO.StreamReader("rating.txt");
+            while ((line = rating_file.ReadLine()) != null)
+                ListOfRatings.Add(Convert.ToDouble(line));
+            rating_file.Close();
+
+
+            System.IO.StreamReader pop_file = new System.IO.StreamReader("popularity.txt");
+            while ((line = pop_file.ReadLine()) != null)
+                ListOfPopularity.Add(Convert.ToDouble(line));
+            pop_file.Close();
 
         }
 
@@ -284,7 +348,7 @@ namespace Recomenmovies2
         {
             //ta zmienna mówi ile pól w excelu przeszukujemy - przy 10000 jest już baaardzo długo
             //uwaga! excel jest posortowany popularnoscia, wiec bierzemy te najbardziej znane filmy
-            int rangeOfSearch = 5000;
+            int rangeOfSearch = ListOfYears.Count;
             //tablica prawdopodobienstw
             double[] TabOfMembership = new double[rangeOfSearch];
             //zerujemy nasz "prawodopodobieństwo"
@@ -298,9 +362,9 @@ namespace Recomenmovies2
                 //tutaj mamy pętle, która spradza zawartość komurki w excelu w różnych rzędach i w 2 kolumnie
                 //czyli właśnie lata
                 int year;
-                for (int rw = 2; rw < rangeOfSearch; rw++)
+                for (int rw = 0; rw < rangeOfSearch; rw++)
                 {
-                    year = (int)(myRange.Cells[rw, 2] as Excel.Range).Value2;
+                    year = ListOfYears[rw];
                     //jeśli rok mieści się w podanych założeniach
                     if (year <= YearTo && year >= YearFrom)
                     {
@@ -351,9 +415,9 @@ namespace Recomenmovies2
                 //tutaj mamy pętle, która spradza zawartość komórki w excelu w różnych rzędach i w 3 kolumnie
                 //czyli właśnie czas trawania
                 int dur;
-                for (int rw = 2; rw < rangeOfSearch; rw++)
+                for (int rw = 0; rw < rangeOfSearch; rw++)
                 {
-                    dur = (int)(myRange.Cells[rw, 3] as Excel.Range).Value2;
+                    dur = ListOfDurations[rw];
                     //jeśli czas mieści się w podanych założeniach
                     if (dur <= DurationTo && dur >= DurationFrom)
                     {
@@ -389,9 +453,9 @@ namespace Recomenmovies2
                 //tutaj mamy pętle, która spradza zawartość komórki w excelu w różnych rzędach i w 7 kolumnie
                 //czyli właśnie ocene
                 double rat;
-                for (int rw = 2; rw < rangeOfSearch; rw++)
+                for (int rw = 0; rw < rangeOfSearch; rw++)
                 {
-                    rat = (double)(myRange.Cells[rw, 7] as Excel.Range).Value2;
+                    rat = ListOfRatings[rw];
                     //jeśli ocena mieści się w podanych założeniach
                     if (rat == rating)
                     {
@@ -426,18 +490,18 @@ namespace Recomenmovies2
                 //to jest potrzebne bo robimy z tych liczb procenty
                 double max = 0.0;
                 double tmp;
-                for (int rw = 2; rw < rangeOfSearch; rw++)
+                for (int rw = 0; rw < rangeOfSearch; rw++)
                 {
-                    tmp = (double)(myRange.Cells[rw, 8] as Excel.Range).Value2;
+                    tmp = ListOfPopularity[rw];
                     if (tmp > max) max = tmp;
                 }
 
                 //tutaj mamy pętle, która spradza zawartość komórki w excelu w różnych rzędach i w 8 kolumnie
                 //czyli właśnie popularność
                 double pop;
-                for (int rw = 2; rw < rangeOfSearch; rw++)
+                for (int rw = 0; rw < rangeOfSearch; rw++)
                 {
-                    pop = (double)(myRange.Cells[rw, 8] as Excel.Range).Value2;
+                    pop = ListOfPopularity[rw];
                     pop = (pop / max) * 100.0;
                     //jeśli popularnosc mieści się w podanych założeniach
                     if (pop == popularity)
@@ -472,7 +536,7 @@ namespace Recomenmovies2
             //wypisywanie informacji o wynikach
             //to jest do zmiany, ale chcę wiedzieć, że się dobrze oblicza i są różne wyniki w granicach [0,1]
             string toShow = "";
-            for (int i = 2; i < rangeOfSearch; i++)
+            for (int i = 0; i < rangeOfSearch; i++)
             {
                 toShow += TabOfMembership[i].ToString("0.##") + "  ";
             }

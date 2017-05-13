@@ -119,5 +119,29 @@
       <EmbedInteropTypes>True</EmbedInteropTypes>
     </COMReference>
   </ItemGroup>
+  <ItemGroup>
+    <Resource Include="country.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="duration.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="genre.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="language.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="popularity.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="rating.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="title.txt" />
+  </ItemGroup>
+  <ItemGroup>
+    <Resource Include="year.txt" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
