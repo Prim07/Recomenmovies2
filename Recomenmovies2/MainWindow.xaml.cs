@@ -66,7 +66,7 @@ namespace Recomenmovies2
         public MainWindow()
         {
             InitializeComponent();
-
+            //PPP
             //Initialization of components
             string line;
             countries_items_origin = new List<string>();
