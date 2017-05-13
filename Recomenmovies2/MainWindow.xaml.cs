@@ -14,20 +14,10 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using System.Text.RegularExpressions;
 
-//using Excel = Microsoft.Office.Interop.Excel;
-
 namespace Recomenmovies2
 {
     public partial class MainWindow : Window
     {
-
-        /*//zmienne potrzebne do załadowania Excela
-        /Excel.Application myApp;
-        Excel.Workbook myWorkBook;
-        Excel.Worksheet myWorkSheet;
-        Excel.Range myRange;
-        int rows;
-        int cols;*/
 
         List<int> ListOfYears = new List<int>();
         List<string> ListOfTitles = new List<string>();
@@ -61,6 +51,11 @@ namespace Recomenmovies2
         List<string> languages_items;
         List<string> genres_items;
 
+        //Lists to keep selected things
+        List<string> selected_countries = new List<string>();
+        List<string> selected_languages = new List<string>();
+        List<string> selected_genres = new List<string>();
+
 
         public MainWindow()
         {
@@ -93,6 +88,9 @@ namespace Recomenmovies2
             // Refresh
             RefreshView();
 
+            //Load files
+            LoadFiles();
+
         }
 
         private void RefreshView()
@@ -107,18 +105,8 @@ namespace Recomenmovies2
         }
 
         // Loading excel
-        private void OnClickStart(object sender, RoutedEventArgs e)
+        private void LoadFiles()
         {
-
-            //2
-            //Zanim cokolwiek zrobisz musisz dać to Click w Start bo to ładuje Excela z danymi
-            /* myApp = new Excel.Application();
-             //TUTAJ zmien sobie ścieżkę 
-             myWorkBook = myApp.Workbooks.Open(@"C:\temp\dane.xlsx", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-             myWorkSheet = (Excel.Worksheet)myWorkBook.Worksheets.get_Item(1);
-             myRange = myWorkSheet.UsedRange;
-             rows = myRange.Rows.Count;
-             cols = myRange.Columns.Count;*/
 
             string line;
             System.IO.StreamReader countriy_file = new System.IO.StreamReader("country.txt");
@@ -143,9 +131,7 @@ namespace Recomenmovies2
             while ((line = lan_file.ReadLine()) != null)
                 ListOfLanguages.Add(line);
             lan_file.Close();
-
-
-
+            
             int x;
             System.IO.StreamReader year_file = new System.IO.StreamReader("year.txt");
             while ((line = year_file.ReadLine()) != null)
@@ -205,6 +191,7 @@ namespace Recomenmovies2
                 else
                 {
                     ToYearTextBlock.Background = Brushes.White;
+                    RefreshChoices();
                 }
             }
         }
@@ -232,6 +219,7 @@ namespace Recomenmovies2
                 else
                 {
                     textBox.Background = Brushes.White;
+                    RefreshChoices();
                 }
             }
 
@@ -245,6 +233,7 @@ namespace Recomenmovies2
             {
                 rating = (float)slider.Value;
                 AverageRating.Text = rating.ToString("0.#");
+                RefreshChoices();
             }
         }
 
@@ -256,6 +245,7 @@ namespace Recomenmovies2
             {
                 popularity = (int)slider.Value;
                 PopularitySlider.Text = popularity.ToString();
+                RefreshChoices();
             }
         }
 
@@ -597,6 +587,100 @@ namespace Recomenmovies2
             }
             languages_items = new_languages_items;
             RefreshView();
+        }
+
+        //Refreshing 'Choices' textblock
+        private void RefreshChoices()
+        {
+            string myString = "";
+
+            //bool Years = false;
+            //bool Genre = false;
+            //bool Country = false;
+            //bool Languages = false;
+            //bool Duration = false;
+            //bool Rating = false;
+            //bool Popularity = false;
+
+            if (Years)
+                myString += "Year from " + FromYearTextBlock.Text + " to " + ToYearTextBlock.Text + ".\n";
+
+            if(Genre)
+            {
+                myString += "Genres: ";
+                for (int i = 0; i < selected_genres.Count - 1; i++)
+                {
+                    myString += selected_genres[i] + ", ";
+                }
+                if (selected_genres.Count >= 1)
+                    myString += selected_genres[selected_genres.Count - 1] + ".";
+                myString += "\n";
+            }
+
+            if (Country)
+            {
+                myString += "Countries: ";
+                for (int i = 0; i < selected_countries.Count - 1; i++)
+                {
+                    myString += selected_countries[i] + ", ";
+                }
+                if(selected_countries.Count >= 1)
+                    myString += selected_countries[selected_countries.Count - 1] + ".";
+                myString += "\n";
+            }
+
+            if (Languages)
+            {
+                myString += "Languages: ";
+                for (int i = 0; i < selected_languages.Count - 1; i++)
+                {
+                    myString += selected_languages[i] + ", ";
+                }
+                if (selected_languages.Count >= 1)
+                    myString += selected_languages[selected_languages.Count - 1] + ".";
+                myString += "\n";
+            }
+
+            if (Duration)
+                myString += "Duration from " + FromDuration.Text + " to " + ToDuration.Text + " minutes.\n";
+
+            if(Rating)
+                myString += "Average rating: " + AverageRating.Text + ".\n";
+
+            if (Popularity)
+                myString += "Popularity: " + PopularitySlider.Text + " %.\n";
+
+            ChoicesTextBlock.Text = myString;
+        }
+
+        private void GenresListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selected_genres.Clear();
+
+            foreach (Object selecteditem in GenresListBox.SelectedItems)
+                selected_genres.Add(selecteditem as String);
+
+            RefreshChoices();
+        }
+
+        private void CountryListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selected_countries.Clear();
+
+            foreach (Object selecteditem in CountryListBox.SelectedItems)
+                selected_countries.Add(selecteditem as String);
+
+            RefreshChoices();
+        }
+
+        private void LanguageListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+            selected_languages.Clear();
+
+            foreach (Object selecteditem in LanguageListBox.SelectedItems)
+                selected_languages.Add(selecteditem as String);
+
+            RefreshChoices();
         }
     }
 }
