@@ -109,6 +109,8 @@ namespace Recomenmovies2
         // Loading excel
         private void OnClickStart(object sender, RoutedEventArgs e)
         {
+
+            //2
             //Zanim cokolwiek zrobisz musisz dać to Click w Start bo to ładuje Excela z danymi
             /* myApp = new Excel.Application();
              //TUTAJ zmien sobie ścieżkę 
