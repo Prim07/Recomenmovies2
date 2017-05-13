@@ -93,7 +93,7 @@
                 </GroupBox>
                 <GroupBox Header="Your choices">
                     <StackPanel Height="100" Margin="10,0,0,0">
-                        <TextBlock Name="ChoicesTextBlock" />
+                        <TextBlock x:Name="ChoicesTextBlock" />
                     </StackPanel>
                 </GroupBox>
 
