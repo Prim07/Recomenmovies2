@@ -28,6 +28,7 @@ namespace Recomenmovies2
         Excel.Range myRange;
         int rows;
         int cols;*/
+        //zmiana Pauli
 
         List<int> ListOfYears = new List<int>();
         List<string> ListOfTitles = new List<string>();
