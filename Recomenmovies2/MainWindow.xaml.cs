@@ -28,7 +28,6 @@ namespace Recomenmovies2
         Excel.Range myRange;
         int rows;
         int cols;*/
-        //zmiana Pauli
 
         List<int> ListOfYears = new List<int>();
         List<string> ListOfTitles = new List<string>();
@@ -66,7 +65,7 @@ namespace Recomenmovies2
         public MainWindow()
         {
             InitializeComponent();
-            //PPP
+
             //Initialization of components
             string line;
             countries_items_origin = new List<string>();
