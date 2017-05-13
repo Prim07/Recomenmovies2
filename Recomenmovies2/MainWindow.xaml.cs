@@ -389,17 +389,44 @@ namespace Recomenmovies2
             //rodzaj
             if (Genre)
             {
-
+                for (int rw = 0; rw < rangeOfSearch; rw++)
+                {
+                    for(int i=0; i<selected_genres.Count; i++)
+                    {
+                        if(ListOfGenres[rw].Contains(selected_genres[i]))
+                        {
+                            TabOfMembership[rw] = (TabOfMembership[rw] + 1.0) / 2.0;
+                        }
+                    }
+                }
             }
             //kraj produkcji
             if (Country)
             {
-
+                for (int rw = 0; rw < rangeOfSearch; rw++)
+                {
+                    for (int i = 0; i < selected_countries.Count; i++)
+                    {
+                        if (ListOfCountries[rw].Contains(selected_countries[i]))
+                        {
+                            TabOfMembership[rw] = (TabOfMembership[rw] + 1.0) / 2.0;
+                        }
+                    }
+                }
             }
             //jezyk
             if (Languages)
             {
-
+                for (int rw = 0; rw < rangeOfSearch; rw++)
+                {
+                    for (int i = 0; i < selected_languages.Count; i++)
+                    {
+                        if (ListOfLanguages[rw].Contains(selected_languages[i]))
+                        {
+                            TabOfMembership[rw] = (TabOfMembership[rw] + 1.0) / 2.0;
+                        }
+                    }
+                }
             }
             //czas trwania
             if (Duration)
@@ -527,11 +554,16 @@ namespace Recomenmovies2
             }
             //wypisywanie informacji o wynikach
             //to jest do zmiany, ale chcę wiedzieć, że się dobrze oblicza i są różne wyniki w granicach [0,1]
+
+            double maximum = TabOfMembership.Max();
             string toShow = "";
             for (int i = 0; i < rangeOfSearch; i++)
             {
-                toShow += ListOfTitles[i] + ": ";
-                toShow += TabOfMembership[i].ToString("0.##") + " \n";
+                if(TabOfMembership[i]==maximum)
+                {
+                    toShow += ListOfTitles[i] + ": ";
+                    toShow += TabOfMembership[i].ToString("0.##") + " \n";
+                }
             }
             Output.Text = toShow;
         }
