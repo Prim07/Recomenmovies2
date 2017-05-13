@@ -5,8 +5,111 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:Recomenmovies2"
         mc:Ignorable="d"
-        Title="MainWindow" Height="350" Width="525">
-    <Grid>
-        
-    </Grid>
+            Title="MainWindow" Height="680" Width="1024">
+    <Canvas>
+        <StackPanel Orientation="Horizontal">
+            <StackPanel Height="646" Width="348">
+
+                <GroupBox Header="Start">
+                    <StackPanel>
+                        <Button Name="start" Content="Click" Background="White"  BorderBrush="white" BorderThickness="1" Click="OnClickStart" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Header="Summary">
+                    <StackPanel Orientation="Vertical">
+                        <StackPanel Orientation="Horizontal" Margin="50,0,10,0">
+                            <CheckBox Name="YearsCheckBox" Content="Years" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                            <CheckBox Name="GenreCheckBox" Content="Genre" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                            <CheckBox Name="CountryCheckBox" Content="Country" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                        </StackPanel>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,0,10,10">
+                            <CheckBox Name="LanguageCheckBox" Content="Language" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                            <CheckBox Name="DurationCheckBox" Content="Duration" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                            <CheckBox Name="RatingCheckBox" Content="Rating" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                            <CheckBox Name="PopularityCheckBox" Content="Popularity" HorizontalAlignment="Left"  Margin="10,10,0,0" VerticalAlignment="Top" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
+                        </StackPanel>
+                        <!--<Button Name="summary"  Margin="10,10,10,10" Background="White"  BorderBrush="white" BorderThickness="1" Click="OnClickSummary">Click</Button>-->
+                    </StackPanel>
+                </GroupBox>
+
+
+                <GroupBox Name="GenreGroupBox" Header="Select genre" IsEnabled="False">
+                    <StackPanel>
+                        <TextBox Name="GenresTextBox" TextChanged="GenresTextBox_TextChanged"/>
+                        <ListBox Name="GenresListBox" SelectionMode="Multiple" Height="60" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Name="CountryGroupBox" Header="Select country" IsEnabled="False">
+                    <StackPanel>
+                        <TextBox Name="CountryTextBox" TextChanged="CountryTextBox_TextChanged" />
+                        <ListBox Name="CountryListBox" SelectionMode="Multiple" Height="60" />
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Name="LanguageGroupBox" Header="Select language" IsEnabled="False">
+                    <StackPanel>
+                        <TextBox Name="LanguageTextBox" TextChanged="LanguageTextBox_TextChanged"/>
+                        <ListBox Name="LanguageListBox" SelectionMode="Multiple" Height="60" />
+                    </StackPanel>
+                </GroupBox>
+
+
+
+
+            </StackPanel>
+
+            <StackPanel Height="651" Width="348">
+                <GroupBox Name="DurationGroupBox" Header="Set duration" IsEnabled="False">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="0,10,0,10">
+                            <TextBlock Width="40" Margin="10,0,0,0">From</TextBlock>
+                            <TextBox Name ="FromDuration" PreviewTextInput="PreviewOnlyNumbers" SelectionChanged="FromDuration_SelectionChanged" Width="50"/>
+                            <TextBlock Margin ="30,0,0,0" Width="20">To</TextBlock>
+                            <TextBox Name ="ToDuration" PreviewTextInput="PreviewOnlyNumbers" SelectionChanged="ToDuration_SelectionChanged" Width="50"/>
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Name="YearsGroupBox" Header="Select years" IsEnabled="False" Height="93">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
+                            <TextBlock Width="40">From</TextBlock>
+                            <Slider Maximum="102" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta"/>
+                            <TextBlock Name="FromYearTextBlock" Text="1915" Margin="5, 0, 0, 0" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="10, 10, 10, 10">
+                            <TextBlock Width="40">To</TextBlock>
+                            <Slider Maximum="102" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta_1"/>
+                            <TextBlock Name="ToYearTextBlock" Text="1915" Margin="5, 0, 0, 0" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+                <GroupBox Name="RatingGroupBox" Header="Select average rating" IsEnabled="False">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="50, 10, 10, 10">
+                            <Slider Maximum="10" TickPlacement="BottomRight" TickFrequency="0.1" Width="206" Thumb.DragDelta="Slider_DragDelta_2"/>
+                            <TextBlock Name="AverageRating" Text="0" Margin="5, 0, 0, 0" />
+                        </StackPanel>
+                    </StackPanel>
+
+                </GroupBox>
+                <GroupBox Name="PopularityGroupBox" Header="Select popularity" IsEnabled="False">
+                    <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="50, 10, 10, 10">
+                            <Slider Maximum="100" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta_3"/>
+                            <TextBlock Name="PopularitySlider" Text="0" Margin="5, 0, 0, 0" />
+                            <TextBlock Text="%" Margin="1, 0, 0, 0" />
+                        </StackPanel>
+                    </StackPanel>
+                </GroupBox>
+
+
+                <GroupBox Header="Recommend movies!">
+                    <StackPanel Margin="0,5,0,0">
+                        <Button Content="Recommend!" Click="Button_Click" Width="206"/>
+                        <TextBox Name="Output" Height="32" Margin="0,10,0.2,0"></TextBox>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </StackPanel>
+    </Canvas>
 </Window>
