@@ -530,7 +530,8 @@ namespace Recomenmovies2
             string toShow = "";
             for (int i = 0; i < rangeOfSearch; i++)
             {
-                toShow += TabOfMembership[i].ToString("0.##") + "  ";
+                toShow += ListOfTitles[i] + ": ";
+                toShow += TabOfMembership[i].ToString("0.##") + " \n";
             }
             Output.Text = toShow;
         }
