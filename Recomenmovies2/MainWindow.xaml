@@ -106,9 +106,20 @@
             </StackPanel>
             <StackPanel Width="319">
                 <GroupBox Header="Your recommendations">
-                    <TextBox Name="Output" Height="200" Margin="0,20,3,0" />
+                    <StackPanel>
+                        <!--<TextBox Name="Output" Height="200" Margin="0,20,3,0" />-->
+                        <ScrollViewer VerticalScrollBarVisibility="Visible" HorizontalScrollBarVisibility="Auto" Height="450" Margin="0,0,-0.333,0">
+                            <StackPanel Name="StackPanelForRecommendations">
+
+                            </StackPanel>
+                        </ScrollViewer>
+
+                    </StackPanel>
                 </GroupBox>
-                
+                <GroupBox Header="Movie info" >
+                    <StackPanel Name="StackPanelForMovieInfo" Margin="10,5,-2.333,5" Height="130"/>
+                </GroupBox>
+
             </StackPanel>
         </StackPanel>
     </Canvas>
