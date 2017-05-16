@@ -20,16 +20,6 @@ namespace Recomenmovies2
 {
     public partial class MainWindow : Window
     {
-
-        List<int> ListOfYears = new List<int>();
-        List<string> ListOfTitles = new List<string>();
-        List<string> ListOfGenres = new List<string>();
-        List<string> ListOfCountries = new List<string>();
-        List<string> ListOfLanguages = new List<string>();
-        List<int> ListOfDurations = new List<int>();
-        List<double> ListOfRatings = new List<double>();
-        List<double> ListOfPopularity = new List<double>();
-
         int YearFrom = 1915;
         int YearTo = 1915;
         double rating = 0.0;
@@ -114,61 +104,6 @@ namespace Recomenmovies2
         // Loading files
         private void LoadFiles()
         {
-
-            string line;
-            System.IO.StreamReader countriy_file = new System.IO.StreamReader("country.txt");
-            while ((line = countriy_file.ReadLine()) != null)
-                ListOfCountries.Add(line);
-            countriy_file.Close();
-
-
-            System.IO.StreamReader title_file = new System.IO.StreamReader("title.txt");
-            while ((line = title_file.ReadLine()) != null)
-                ListOfTitles.Add(line);
-            title_file.Close();
-
-
-            System.IO.StreamReader genre_file = new System.IO.StreamReader("genre.txt");
-            while ((line = genre_file.ReadLine()) != null)
-                ListOfGenres.Add(line);
-            genre_file.Close();
-
-
-            System.IO.StreamReader lan_file = new System.IO.StreamReader("language.txt");
-            while ((line = lan_file.ReadLine()) != null)
-                ListOfLanguages.Add(line);
-            lan_file.Close();
-            
-            int x;
-            System.IO.StreamReader year_file = new System.IO.StreamReader("year.txt");
-            while ((line = year_file.ReadLine()) != null)
-            {
-                Int32.TryParse(line, out x);
-                ListOfYears.Add(x);
-            }
-            year_file.Close();
-
-
-            System.IO.StreamReader dur_file = new System.IO.StreamReader("duration.txt");
-            while ((line = dur_file.ReadLine()) != null)
-            {
-                Int32.TryParse(line, out x);
-                ListOfDurations.Add(x);
-            }
-            dur_file.Close();
-
-
-            System.IO.StreamReader rating_file = new System.IO.StreamReader("rating.txt");
-            while ((line = rating_file.ReadLine()) != null)
-                ListOfRatings.Add(Convert.ToDouble(line));
-            rating_file.Close();
-
-
-            System.IO.StreamReader pop_file = new System.IO.StreamReader("popularity.txt");
-            while ((line = pop_file.ReadLine()) != null)
-                ListOfPopularity.Add(Convert.ToDouble(line));
-            pop_file.Close();
-
             using (TextFieldParser parser = new TextFieldParser(@"c:\temp\dane.csv"))
             {
                 parser.TextFieldType = FieldType.Delimited;
@@ -293,16 +228,13 @@ namespace Recomenmovies2
             //uwaga! excel jest posortowany popularnoscia, wiec bierzemy te najbardziej znane filmy
             int rangeOfSearch = ListOfMovies.Count;
 
-            //tablica prawdopodobienstw
-            double[] TabOfMembership = new double[rangeOfSearch];
-
             //clear stack panel with recommendations
             StackPanelForRecommendations.Children.Clear();
 
             //========== Część z popularnością
             //szukamy maksymalnej warości popularnosci
             //to jest potrzebne bo robimy z tych liczb procenty
-            double max = ListOfPopularity.Max();
+            double max = ListOfMovies.Max(o => o.popularity);
             
             for (int rw = 0; rw < rangeOfSearch; rw++)
             {
@@ -314,7 +246,7 @@ namespace Recomenmovies2
                 {
                     //tutaj mamy pętle, która spradza zawartość komórki w excelu w różnych rzędach i w 2 kolumnie
                     //czyli właśnie lata
-                    int year = ListOfYears[rw];
+                    int year = ListOfMovies[rw].year;
                     //jeśli rok mieści się w podanych założeniach
                     if ((year <= YearTo && year >= YearFrom))
                     {
