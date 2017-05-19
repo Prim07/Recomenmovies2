@@ -20,13 +20,17 @@ namespace Recomenmovies2
 {
     public partial class MainWindow : Window
     {
+        // public variables
         int YearFrom = 1915;
         int YearTo = 1915;
-        double rating = 0.0;
-        double popularity = 0.0;
+        double ratingFrom = 1.0;
+        double ratingTo = 1.0;
+        double popularityFrom = 1.0;
+        double popularityTo = 1.0;
         int DurationFrom;
         int DurationTo;
 
+        //bools connected with checkboxes
         bool Years = false;
         bool Genre = false;
         bool Country = false;
@@ -34,6 +38,17 @@ namespace Recomenmovies2
         bool Duration = false;
         bool Rating = false;
         bool Popularity = false;
+        bool BindRating = false;
+        bool BindPopularity = false;
+
+        //weights of choices
+        int weight_of_years = 1;
+        int weight_of_genres = 1;
+        int weight_of_countries = 1;
+        int weight_of_languages = 1;
+        int weight_of_duration = 1;
+        int weight_of_rating = 1;
+        int weight_of_popularity = 1;
 
         //Lists with elements to view and choose
         List<string> countries_items_origin;
@@ -48,16 +63,17 @@ namespace Recomenmovies2
         List<string> selected_languages = new List<string>();
         List<string> selected_genres = new List<string>();
 
-        // HashSet of Movies
-        //HashSet<Movie> moviesHashSet = new HashSet<Movie>();
+        //List of all movies
         List<Movie> ListOfMovies = new List<Movie>();
         List<Movie> SortedList;
-
+        
+        // list of realtions
+        double[,] ArrayOfRelations;
 
         public MainWindow()
         {
             InitializeComponent();
-
+            
             //Initialization of components
             string line;
             countries_items_origin = new List<string>();
@@ -116,16 +132,39 @@ namespace Recomenmovies2
                     tmpMovie.title = fields[0];
                     tmpMovie.year = Int32.Parse(fields[1]);
                     tmpMovie.duration = Int32.Parse(fields[2]);
-                    tmpMovie.genre = fields[3];
+                    fields[3] = TrimAllWithInplaceCharArray(fields[3]);
+                    tmpMovie.genre = fields[3].Split(',');
                     tmpMovie.language = fields[4];
                     tmpMovie.country = fields[5];
                     tmpMovie.rating = Convert.ToDouble(fields[6]);
                     tmpMovie.popularity = Convert.ToDouble(fields[7]);
-                    foreach (string field in fields)
-                    {
-                        //TODO: Process field
-                    }
                     ListOfMovies.Add(tmpMovie);
+                }
+            }
+
+            using (TextFieldParser parser = new TextFieldParser(@"c:\temp\relations_in_genres.csv"))
+            {
+                int size = genres_items_origin.Count;
+                ArrayOfRelations = new double[size, size];
+
+                parser.TextFieldType = FieldType.Delimited;
+                parser.SetDelimiters(";");
+                int row = 0;
+                while (!parser.EndOfData)
+                {
+                    string[] fields = parser.ReadFields();
+                    if (row != 0)
+                    {
+                        for (int col = 1; col <= row; col++)
+                        {
+                            if (fields[col] != "")
+                            {
+                                ArrayOfRelations[row - 1, col - 1] = Convert.ToDouble(fields[col]);
+                                ArrayOfRelations[col - 1, row - 1] = Convert.ToDouble(fields[col]);
+                            }
+                        }
+                    }
+                    row++;
                 }
             }
 
@@ -192,27 +231,87 @@ namespace Recomenmovies2
 
         }
 
-        // Event on change of slider - to rating
+        // Event on change of slider - to ratingFrom
         private void Slider_DragDelta_2(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
             Slider slider = sender as Slider;
             if (slider != null)
             {
-                rating = Math.Round((double)slider.Value, 1);
-                AverageRating.Text = rating.ToString("0.#");
+                ratingFrom = Math.Round((double)slider.Value, 1);
+                AverageRatingFromTextBlock.Text = ratingFrom.ToString("0.#");
+                if (BindRating)
+                {
+                    AverageRatingToTextBlock.Background = Brushes.White;
+                    AverageRatingToTextBlock.Text = ratingFrom.ToString("0.#");
+                }
+
                 RefreshChoices();
             }
         }
 
-        // Event on change of slider - to rating
+
+
+        private void Slider_DragDelta_22(object sender, RoutedEventArgs e)
+        {
+            Slider slider = sender as Slider;
+            if (slider != null)
+            {
+                ratingTo = Math.Round((double)slider.Value, 1);
+                AverageRatingToTextBlock.Text = ratingTo.ToString("0.#");
+                if (ratingTo < ratingFrom)
+                {
+                    AverageRatingToTextBlock.Background = Brushes.OrangeRed;
+                    ratingTo = ratingFrom;
+                    RefreshChoices();
+                }
+                else
+                {
+                    AverageRatingToTextBlock.Background = Brushes.White;
+                    RefreshChoices();
+                }
+            }
+
+        }
+
+        // Event on change of slider - to popularityFrom
         private void Slider_DragDelta_3(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
         {
             Slider slider = sender as Slider;
             if (slider != null)
             {
-                popularity = (int)slider.Value;
-                PopularitySlider.Text = popularity.ToString();
+                popularityFrom = (int)slider.Value;
+                PopularitySliderFromTextBlock.Text = popularityFrom.ToString();
+                if(BindPopularity)
+                {
+                    PopularitySliderToTextBlock.Background = Brushes.White;
+                    PopularitySliderToTextBlock.Text = popularityFrom.ToString();
+                }
+                    
+
                 RefreshChoices();
+            }
+        }
+
+
+        // Event on change of slider - to popularityTo
+        private void Slider_DragDelta_33(object sender, System.Windows.Controls.Primitives.DragDeltaEventArgs e)
+        {
+            Slider slider = sender as Slider;
+            if (slider != null)
+            {
+                popularityTo = (int)slider.Value;
+                PopularitySliderToTextBlock.Text = popularityTo.ToString();
+                if (popularityTo < popularityFrom)
+                {
+                    PopularitySliderToTextBlock.Background = Brushes.OrangeRed;
+                    popularityTo = popularityFrom;
+                    RefreshChoices();
+                }
+                else
+                {
+                    PopularitySliderToTextBlock.Background = Brushes.White;
+                    RefreshChoices();
+                }
             }
         }
 
@@ -235,9 +334,16 @@ namespace Recomenmovies2
             //szukamy maksymalnej warości popularnosci
             //to jest potrzebne bo robimy z tych liczb procenty
             double max = ListOfMovies.Max(o => o.popularity);
-            
+
             for (int rw = 0; rw < rangeOfSearch; rw++)
             {
+                double yearMem = 0.0;
+                double genreMem = 0.0;
+                double languageMem = 0.0;
+                double countryMem = 0.0;
+                double ratingMem = 0.0;
+                double popularityMem = 0.0;
+                double durationMem = 0.0;
                 firstMemChange = true;
                 //zerujemy nasz "prawodopodobieństwo"
                 ListOfMovies[rw].membs_degree = 0.0;
@@ -253,7 +359,8 @@ namespace Recomenmovies2
                         //to robimy średnia arytmetyczna z jego membership dagree i 1.0
                         //to jest taki tylko moj pomysl na szybko i jak najbardziej mozesz to modyfikować
                         // jeśli pierwsza zmiana, to 1.0, a jeśli nie, to średnia arytmetyczna
-                        ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                        yearMem = (double)weight_of_years * 1.0;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
                         //tu sprawdzamy czy rok jest odrobinę za niski lub odrobinę za wysoki
                         //musza byc takie dlugie warunki bo się sypie inaczej
                     }
@@ -273,7 +380,8 @@ namespace Recomenmovies2
                             diff = year - YearTo;
                             diff = 1.0 - diff / 10.0;
                         }
-                        ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + diff) / 2.0;
+                        yearMem = weight_of_years * diff;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + weight_of_years*diff) /(1.0 + (double)weight_of_years);
                     }
 
                     firstMemChange = false;
@@ -281,16 +389,26 @@ namespace Recomenmovies2
                 //rodzaj
                 if (Genre)
                 {
-                    int counterOfEquals = 0;
-                    for (int i = 0; i < selected_genres.Count; i++)
+                    double sumOfMembs = 0.0;
+                    double sumOfMembsAdd = 0.0;
+
+                    for (int j = 0; j < selected_genres.Count; j++)
                     {
-                        if (ListOfMovies[rw].genre.Contains(selected_genres[i]))
+                        string currentSelectedGenre = selected_genres[j];
+                        for (int i = 0; i < ListOfMovies[rw].genre.Length; i++)
                         {
-                            counterOfEquals++;
+                            string currentGenreInMovie = ListOfMovies[rw].genre[i];
+                            int row = genres_items_origin.IndexOf(currentSelectedGenre);
+                            int col = genres_items_origin.IndexOf(currentGenreInMovie);
+                            sumOfMembsAdd = (sumOfMembsAdd > ArrayOfRelations[row, col]) ? sumOfMembsAdd : ArrayOfRelations[row, col];
                         }
+                        sumOfMembs += sumOfMembsAdd;
+                        sumOfMembsAdd = 0.0;
                     }
-                    ListOfMovies[rw].membs_degree = firstMemChange ? (double)counterOfEquals / selected_genres.Count : (ListOfMovies[rw].membs_degree + 1.0 * ((double)(counterOfEquals / selected_genres.Count))) / 2.0;
+                    genreMem = (double)weight_of_genres * (sumOfMembs / selected_genres.Count);
+                    //ListOfMovies[rw].membs_degree = firstMemChange ? (sumOfMembs / selected_genres.Count) : (ListOfMovies[rw].membs_degree + (double)weight_of_genres * (sumOfMembs / selected_genres.Count)) / (1.0 + (double)weight_of_genres);
                     firstMemChange = false;
+
                 }
                 //kraj produkcji
                 if (Country)
@@ -300,7 +418,8 @@ namespace Recomenmovies2
                     {
                         if (ListOfMovies[rw].country.Contains(selected_countries[i]))
                         {
-                            ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                            countryMem = (double)weight_of_countries * 1.0;
+                            //ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + (double)weight_of_countries*1.0) / (1.0 + (double)weight_of_countries);
                         }
                     }
                     firstMemChange = false;
@@ -312,7 +431,8 @@ namespace Recomenmovies2
                     {
                         if (ListOfMovies[rw].language.Contains(selected_languages[i]))
                         {
-                            ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                            languageMem = (double)weight_of_languages * 1.0;
+                            //ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + (double)weight_of_languages*1.0) / (1.0 + (double)weight_of_languages);
                         }
                     }
                     firstMemChange = false;
@@ -328,7 +448,8 @@ namespace Recomenmovies2
                     {
                         //to robimy średnia srytmetyczna z jego membership dagree i 1.0
                         //to jest taki tylko moj pomysl na szybko i jak najbardziej mozesz to modyfikować
-                        ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                        durationMem = (double)weight_of_duration * 1.0;
+                       // ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
                         //tu sprawdzamy czy czas jest odrobinę za niski lub odrobinę za wysoki
                         //musza byc takie dlugie warunki bo się sypie inaczej
                     }
@@ -348,7 +469,8 @@ namespace Recomenmovies2
                             diff = dur - DurationTo;
                             diff = 1.0 - diff / 15.0;
                         }
-                        ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + diff) / 2.0;
+                        durationMem = (double)weight_of_duration * diff;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + (double)weight_of_duration*diff) / (1.0 + (double)weight_of_duration);
                     }
                     firstMemChange = false;
                 }
@@ -359,29 +481,31 @@ namespace Recomenmovies2
                     //czyli właśnie ocene
                     double rat = ListOfMovies[rw].rating;
                     //jeśli ocena mieści się w podanych założeniach
-                    if (rat == rating)
+                    if (rat <= ratingTo && rat >= ratingFrom)
                     {
                         //to robimy średnia arytmetyczna z jego membership dagree i 1.0
                         //to jest taki tylko moj pomysl na szybko i jak najbardziej mozesz to modyfikować
-                        ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                        ratingMem = (double)weight_of_rating * 1.0;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
                         //tu sprawdzamy czy ocena jest odrobinę za niska lub odrobinę za wysoka
                         //musza byc takie dlugie warunki bo się sypie inaczej
                     }
-                    else if ((rat <= (rating + 1.0) && rat > rating) || (rat >= (rating - 1.0) && rat < rating))
+                    else if ((rat <= (ratingTo + 1.0) && rat > ratingTo) || (rat >= (ratingFrom - 1.0) && rat < ratingFrom))
                     {
                         //tutaj obliczamy różnice czyli ile naszej komórce z excela brakuje do poprawnego wyniku
                         //czyli jak na przyklad mamy ocene 8.0, a ocena jest 7.8, 
                         //to mu przypiszemy coś trochę mniejszego niż jeden
                         double diff;
-                        if (rat <= (rating + 1.0) && rat > rating)
+                        if (rat <= (ratingTo + 1.0) && rat > ratingTo)
                         {
-                            diff = (rating + 1.0) - rat;
+                            diff = (ratingTo + 1.0) - rat;
                         }
                         else
                         {
-                            diff = rat - (rating - 1.0);
+                            diff = rat - (ratingFrom - 1.0);
                         }
-                        ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + diff) / 2.0;
+                        ratingMem = (double)weight_of_rating * diff;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + (double)weight_of_rating*diff) / (1.0 + (double)weight_of_rating);
                     }
                     firstMemChange = false;
                 }
@@ -390,38 +514,80 @@ namespace Recomenmovies2
                 {
                     //tutaj mamy pętle, która spradza zawartość komórki w excelu w różnych rzędach i w 8 kolumnie
                     //czyli właśnie popularność
-                    double pop = ListOfMovies[rw].popularity;
-                    pop = (pop / max) * 100.0;
+                    //zakładamy, że tabela jest posortowana malejąco wg popularności
+                    double pop = rangeOfSearch - rw - 1;
+                    pop = (((double)(pop / (double)rangeOfSearch)) * 100.0);
                     //jeśli popularnosc mieści się w podanych założeniach
-                    if (pop == popularity)
+                    if ((int)pop + 1 <= (int)popularityFrom && (int)pop + 1 >= (int)popularityTo)
                     {
                         //to robimy średnia srytmetyczna z jego membership dagree i 1.0
                         //to jest taki tylko moj pomysl na szybko i jak najbardziej mozesz to modyfikować
-                        ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
+                        popularityMem = 1.0 * (double)weight_of_popularity;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? 1.0 : (ListOfMovies[rw].membs_degree + 1.0) / 2.0;
                         //tu sprawdzamy czy popularnosc jest odrobinę za niska lub odrobinę za wysoka
                         //musza byc takie dlugie warunki bo się sypie inaczej
                     }
-                    else if ((pop <= (popularity + 20.0) && pop > popularity) || (pop >= (popularity - 20.0) && pop < popularity))
+                    else if ((pop <= (popularityTo + 10.0) && pop > popularityTo) || (pop >= (popularityFrom - 10.0) && pop < popularityFrom))
 
                     {
                         //tutaj obliczamy różnice czyli ile naszej komurce z excela brakuje do poprawnego wyniku
                         //czyli jak na przyklad mamy popularnosc 80%, a pop jest 79%, 
                         //to mu przypiszemy coś trochę mniejszego niż jeden
                         double diff;
-                        if (pop <= (popularity + 20.0) && pop > popularity)
+                        if (pop <= (popularityTo + 10.0) && pop > popularityTo)
                         {
-                            diff = (popularity + 20.0) - pop;
-                            diff = diff / 20.0;
+                            diff = (popularityTo + 10.0) - pop;
+                            diff = diff / 10.0;
                         }
                         else
                         {
-                            diff = pop - (popularity - 20.0);
-                            diff = diff / 20.0;
+                            diff = pop - (popularityFrom - 10.0);
+                            diff = diff / 10.0;
                         }
-                        ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + diff) / 2.0;
+                        popularityMem = diff * (double)weight_of_popularity;
+                        //ListOfMovies[rw].membs_degree = firstMemChange ? diff : (ListOfMovies[rw].membs_degree + (double)weight_of_popularity*diff) / (1.0 + (double)weight_of_popularity);
                     }
                     firstMemChange = false;
                 }
+
+                double weight = 0.0;
+                if (Years)
+                {
+                    weight += weight_of_years;
+                }
+
+                if (Genre)
+                {
+                    weight += weight_of_genres;
+                }
+
+                if (Country)
+                {
+                    weight += weight_of_countries;
+                }
+
+                if (Languages)
+                {
+                    weight += weight_of_languages;
+                }
+
+                if (Duration)
+                {
+                    weight += weight_of_duration;
+                }
+
+                if (Rating)
+                {
+                    weight += weight_of_rating;
+                }
+
+                if (Popularity)
+                {
+                    weight += weight_of_popularity;
+                }
+
+                ListOfMovies[rw].membs_degree = (double)(yearMem + genreMem + countryMem + languageMem + durationMem + ratingMem + popularityMem) / weight;
+
             }
 
 
@@ -461,9 +627,16 @@ namespace Recomenmovies2
 
 
             string info_string = "Year: " + SortedList[i].year
-                               + "\nDuration: " + SortedList[i].duration + " mins"
-                               + "\nGenre: " + SortedList[i].genre
-                               + "\nLanguage: " + SortedList[i].language
+                               + "\nDuration: " + SortedList[i].duration + " mins";
+            info_string += "\nGenre: ";
+            
+            
+            for (int j = 0; j < SortedList[i].genre.Length - 1; j++)
+                info_string += SortedList[i].genre[j] + ", ";
+            if (SortedList[i].genre.Length >= 1)
+                info_string += SortedList[i].genre[SortedList[i].genre.Length - 1] + ".";
+
+            info_string += "\nLanguage: " + SortedList[i].language
                                + "\nCountry: " + SortedList[i].country
                                + "\nRating: " + SortedList[i].rating
                                + "\nPopularity: " + SortedList[i].popularity;
@@ -531,57 +704,281 @@ namespace Recomenmovies2
         //Refreshing 'Choices' textblock
         private void RefreshChoices()
         {
-            string myString = "";
 
-            if (Years)
-                myString += "Year from " + FromYearTextBlock.Text + " to " + ToYearTextBlock.Text + ".\n";
-
-            if(Genre)
+            StackPanelForChoices.Children.Clear();
+            
+            if (Genre)
             {
-                myString += "Genres: ";
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 1 - Genre
+                ProduceWeightPanel(1, myStackPanel);
+                
+                string myString = "Genres: ";
                 for (int i = 0; i < selected_genres.Count - 1; i++)
                 {
                     myString += selected_genres[i] + ", ";
                 }
                 if (selected_genres.Count >= 1)
                     myString += selected_genres[selected_genres.Count - 1] + ".";
-                myString += "\n";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+                
+                StackPanelForChoices.Children.Add(myStackPanel);
             }
 
             if (Country)
             {
-                myString += "Countries: ";
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 3 - Country
+                ProduceWeightPanel(3, myStackPanel);
+
+                string myString = "Countries: ";
                 for (int i = 0; i < selected_countries.Count - 1; i++)
                 {
                     myString += selected_countries[i] + ", ";
                 }
-                if(selected_countries.Count >= 1)
+                if (selected_countries.Count >= 1)
                     myString += selected_countries[selected_countries.Count - 1] + ".";
-                myString += "\n";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+                
+                StackPanelForChoices.Children.Add(myStackPanel);
             }
 
             if (Languages)
             {
-                myString += "Languages: ";
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 5 - Language
+                ProduceWeightPanel(5, myStackPanel);
+
+                string myString = "Languages: ";
                 for (int i = 0; i < selected_languages.Count - 1; i++)
                 {
                     myString += selected_languages[i] + ", ";
                 }
                 if (selected_languages.Count >= 1)
                     myString += selected_languages[selected_languages.Count - 1] + ".";
-                myString += "\n";
+                
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+
+                StackPanelForChoices.Children.Add(myStackPanel);
             }
 
             if (Duration)
-                myString += "Duration from " + FromDuration.Text + " to " + ToDuration.Text + " minutes.\n";
+            {
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 7 - Duration
+                ProduceWeightPanel(7, myStackPanel);
 
-            if(Rating)
-                myString += "Average rating: " + AverageRating.Text + ".\n";
+                string myString = "Duration from " + FromDuration.Text + " to " + ToDuration.Text + " minutes.";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+
+                StackPanelForChoices.Children.Add(myStackPanel);
+            }
+
+            if (Years)
+            {
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 9 - Duration
+                ProduceWeightPanel(9, myStackPanel);
+
+                string myString = "Year from " + FromYearTextBlock.Text + " to " + ToYearTextBlock.Text + ".";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+
+                StackPanelForChoices.Children.Add(myStackPanel);
+            }
+
+            if (Rating)
+            {
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 11 - Rating
+                ProduceWeightPanel(11, myStackPanel);
+
+                string myString = "Average rating: " + AverageRatingFromTextBlock.Text + " - " + AverageRatingToTextBlock.Text + ".";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+
+                StackPanelForChoices.Children.Add(myStackPanel);
+            }
 
             if (Popularity)
-                myString += "Popularity: " + PopularitySlider.Text + " %.\n";
+            {
+                StackPanel myStackPanel = new StackPanel();
+                myStackPanel.Orientation = Orientation.Horizontal;
+                // 13 - Popularity
+                ProduceWeightPanel(13, myStackPanel);
 
-            ChoicesTextBlock.Text = myString;
+                string myString = "Popularity: " + PopularitySliderFromTextBlock.Text + "% - " + PopularitySliderToTextBlock.Text + " %.";
+
+                TextBlock myTextBlock = new TextBlock();
+                myTextBlock.Text = myString;
+                myStackPanel.Children.Add(myTextBlock);
+
+                StackPanelForChoices.Children.Add(myStackPanel);
+            }
+        }
+
+        // Producing weight Panel
+        private void ProduceWeightPanel(int i, StackPanel myStackPanel)
+        {
+            // 1 - Genre; 3 - Country; 5 - Language
+            // 7 - Duration; 9 - Years; 11 - Rating; 13 - Popularity
+
+            StackPanel weightStackPanel = new StackPanel();
+            weightStackPanel.Orientation = Orientation.Horizontal;
+            weightStackPanel.Margin = new Thickness(0, 0, 10, 5);
+
+            TextBlock weightTextBlock = new TextBlock();
+            weightTextBlock.Margin = new Thickness(0, 0, 5, 0);
+            weightTextBlock.Width = 20;
+            weightTextBlock.TextAlignment = TextAlignment.Center;
+            var bc = new BrushConverter();
+            weightTextBlock.Background = (Brush)bc.ConvertFrom("#d9ff32");
+            string weightString = weight_of_genres.ToString();
+            weightTextBlock.Text = weightString;
+            weightStackPanel.Children.Add(weightTextBlock);
+
+            Button btnPlus = new Button();
+            Button btnMinus = new Button();
+            btnPlus.Tag = i;
+            btnMinus.Tag = i + 1;
+            btnPlus.Click += BtnPlus_Click;
+            btnMinus.Click += BtnMinus_Click;
+            btnPlus.Content = "+";
+            btnMinus.Content = "-";
+            btnPlus.Padding = btnMinus.Padding = new Thickness(0);
+            btnPlus.HorizontalContentAlignment = btnMinus.HorizontalContentAlignment = HorizontalAlignment.Center;
+            btnPlus.VerticalContentAlignment = btnMinus.VerticalContentAlignment = VerticalAlignment.Center;
+            btnPlus.HorizontalAlignment = btnMinus.HorizontalAlignment = HorizontalAlignment.Center;
+            btnPlus.VerticalAlignment = btnMinus.VerticalAlignment = VerticalAlignment.Center;
+            btnPlus.Height = btnMinus.Height = btnPlus.Width = btnMinus.Width = 18;
+            btnPlus.Margin = btnMinus.Margin = new Thickness(1, 0, 1, 0);
+            weightStackPanel.Children.Add(btnPlus);
+            weightStackPanel.Children.Add(btnMinus);
+
+            //Binding
+            Binding myBinding = new Binding();
+            switch (i)
+            {
+                case 1:
+                    myBinding.Source = weight_of_genres;
+                    break;
+                case 3:
+                    myBinding.Source = weight_of_countries;
+                    break;
+                case 5:
+                    myBinding.Source = weight_of_languages;
+                    break;
+                case 7:
+                    myBinding.Source = weight_of_duration;
+                    break;
+                case 9:
+                    myBinding.Source = weight_of_years;
+                    break;
+                case 11:
+                    myBinding.Source = weight_of_rating;
+                    break;
+                case 13:
+                    myBinding.Source = weight_of_popularity;
+                    break;
+            }
+            weightTextBlock.SetBinding(TextBlock.TextProperty, myBinding);
+
+            myStackPanel.Children.Add(weightStackPanel);
+        }
+
+        // Clicked on plus weight button
+        private void BtnPlus_Click(object sender, RoutedEventArgs e)
+        {
+            // 1 - Genre; 3 - Country; 5 - Language
+            // 7 - Duration; 9 - Years; 11 - Rating; 13 - Popularity
+            Button btnPlus = sender as Button;
+            if(btnPlus != null)
+            {
+                int i = (int)btnPlus.Tag;
+                switch(i)
+                {
+                    case 1:
+                        weight_of_genres = (weight_of_genres < 7) ? ++weight_of_genres : 7;
+                        break;
+                    case 3:
+                        weight_of_countries = (weight_of_countries < 7) ? ++weight_of_countries : 7;
+                        break;
+                    case 5:
+                        weight_of_languages = (weight_of_languages < 7) ? ++weight_of_languages : 7;
+                        break;
+                    case 7:
+                        weight_of_duration = (weight_of_duration < 7) ? ++weight_of_duration : 7;
+                        break;
+                    case 9:
+                        weight_of_years = (weight_of_years < 7) ? ++weight_of_years : 7;
+                        break;
+                    case 11:
+                        weight_of_rating = (weight_of_rating < 7) ? ++weight_of_rating : 7;
+                        break;
+                    case 13:
+                        weight_of_popularity = (weight_of_popularity < 7) ? ++weight_of_popularity : 7;
+                        break;
+                }
+            }
+            RefreshChoices();
+        }
+
+        // Clicked on minus weight button
+        private void BtnMinus_Click(object sender, RoutedEventArgs e)
+        {
+            // 2 - Genre; 4 - Country; 6 - Language
+            // 8 - Duration; 10 - Years; 12 - Rating; 14 - Popularity
+            Button btnMinus = sender as Button;
+            if (btnMinus != null)
+            {
+                int i = (int)btnMinus.Tag;
+                switch (i)
+                {
+                    case 2:
+                        weight_of_genres = (weight_of_genres > 1) ? --weight_of_genres : 1;
+                        break;
+                    case 4:
+                        weight_of_countries = (weight_of_countries > 1) ? --weight_of_countries : 1;
+                        break;
+                    case 6:
+                        weight_of_languages = (weight_of_languages > 1) ? --weight_of_languages : 1;
+                        break;
+                    case 8:
+                        weight_of_duration = (weight_of_duration > 1) ? --weight_of_duration : 1;
+                        break;
+                    case 10:
+                        weight_of_years = (weight_of_years > 1) ? --weight_of_years : 1;
+                        break;
+                    case 12:
+                        weight_of_rating = (weight_of_rating > 1) ? --weight_of_rating : 1;
+                        break;
+                    case 14:
+                        weight_of_popularity = (weight_of_popularity > 1) ? --weight_of_popularity : 1;
+                        break;
+                }
+            }
+            RefreshChoices();
         }
 
         private void GenresListBox_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -613,6 +1010,7 @@ namespace Recomenmovies2
 
             RefreshChoices();
         }
+
         // Action that triggers on every change of check box from Summary group box
         private void AnyCheckBoxAction(object sender, RoutedEventArgs e)
         {
@@ -624,6 +1022,8 @@ namespace Recomenmovies2
             Duration = DurationCheckBox.IsChecked.GetValueOrDefault();
             Rating = RatingCheckBox.IsChecked.GetValueOrDefault();
             Popularity = PopularityCheckBox.IsChecked.GetValueOrDefault();
+            BindPopularity = BindPopularityCheckBox.IsChecked.GetValueOrDefault();
+            BindRating = BindRatingCheckBox.IsChecked.GetValueOrDefault();
 
             if (Years)
             {
@@ -687,14 +1087,79 @@ namespace Recomenmovies2
             {
                 PopularityGroupBox.IsEnabled = false;
             }
+
+            if (BindPopularity)
+            {
+                PopularityToSlider.IsEnabled = false;
+            }
+            else
+            {
+                PopularityToSlider.IsEnabled = true;
+            }
+
+            if (BindRating)
+            {
+                AverageRatingToSlider.IsEnabled = false;
+            }
+            else
+            {
+                AverageRatingToSlider.IsEnabled = true;
+            }
         }
 
-        
+
+
+
         // Sprawdza czy wpisane są liczby
         private void PreviewOnlyNumbers(object sender, TextCompositionEventArgs e)
         {
             Regex regex = new Regex("[^0-9]+");
             e.Handled = regex.IsMatch(e.Text);
+        }
+        
+        // Cut all whitespaces from given string and return this string
+        public static string TrimAllWithInplaceCharArray(string str)
+        {
+            var len = str.Length;
+            var src = str.ToCharArray();
+            int dstIdx = 0;
+            for (int i = 0; i < len; i++)
+            {
+                var ch = src[i];
+                switch (ch)
+                {
+                    case '\u0020':
+                    case '\u00A0':
+                    case '\u1680':
+                    case '\u2000':
+                    case '\u2001':
+                    case '\u2002':
+                    case '\u2003':
+                    case '\u2004':
+                    case '\u2005':
+                    case '\u2006':
+                    case '\u2007':
+                    case '\u2008':
+                    case '\u2009':
+                    case '\u200A':
+                    case '\u202F':
+                    case '\u205F':
+                    case '\u3000':
+                    case '\u2028':
+                    case '\u2029':
+                    case '\u0009':
+                    case '\u000A':
+                    case '\u000B':
+                    case '\u000C':
+                    case '\u000D':
+                    case '\u0085':
+                        continue;
+                    default:
+                        src[dstIdx++] = ch;
+                        break;
+                }
+            }
+            return new string(src, 0, dstIdx);
         }
     }
 }

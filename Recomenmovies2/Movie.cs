@@ -11,7 +11,7 @@ namespace Recomenmovies2
         //public variables in Movie clas defining a movie
         public int year;
         public string title;
-        public string genre;
+        public string[] genre;
         public string country;
         public string language;
         public int duration;

@@ -74,26 +74,51 @@
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Name="RatingGroupBox" Header="Select average rating" IsEnabled="False">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="50, 10, 10, 10">
-                            <Slider Maximum="10" TickPlacement="BottomRight" TickFrequency="0.1" Width="206" Thumb.DragDelta="Slider_DragDelta_2"/>
-                            <TextBlock Name="AverageRating" Text="0" Margin="5, 0, 0, 0" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel Orientation="Vertical">
+                            <StackPanel Width="251">
+                        <StackPanel Orientation="Horizontal" Margin="15, 10, 10, 10">
+                            <Slider Maximum="10" Minimum="1" TickPlacement="BottomRight" TickFrequency="0.1" Width="206" Thumb.DragDelta="Slider_DragDelta_2"/>
+                            <TextBlock Name="AverageRatingFromTextBlock" Text="1" Margin="5, 0, 0, 0" />
+                        </StackPanel>
+
+
+                        <StackPanel Orientation="Horizontal" Margin="15, 10, 10, 10">
+                            <Slider Name="AverageRatingToSlider" Maximum="10" Minimum="1" TickPlacement="BottomRight" TickFrequency="0.1" Width="206" Thumb.DragDelta="Slider_DragDelta_22"/>
+                            <TextBlock Name="AverageRatingToTextBlock" Text="1" Margin="5, 0, 0, 0" />
+                        </StackPanel>
+                    </StackPanel>
+                        </StackPanel>
+
+
+                        <StackPanel Width="93">
+                            <CheckBox x:Name="BindRatingCheckBox" Content="Bind &#xa;rating" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin = "0,25,0,0"  Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
                         </StackPanel>
                     </StackPanel>
 
-                </GroupBox>
+        </GroupBox>
                 <GroupBox Name="PopularityGroupBox" Header="Select popularity" IsEnabled="False">
-                    <StackPanel>
-                        <StackPanel Orientation="Horizontal" Margin="50, 10, 10, 10">
-                            <Slider Maximum="100" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta_3"/>
-                            <TextBlock Name="PopularitySlider" Text="0" Margin="5, 0, 0, 0" />
+                    <StackPanel Orientation="Horizontal">
+                        <StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15, 10, 10, 10">
+                            <Slider Name="PopularitySliderFrom" Maximum="100" Minimum="1" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta_3" />
+                            <TextBlock Name="PopularitySliderFromTextBlock" Text="1" Margin="5, 0, 0, 0" />
                             <TextBlock Text="%" Margin="1, 0, 0, 0" />
+                        </StackPanel>
+                        <StackPanel Orientation="Horizontal" Margin="15, 10, 10, 10">
+                                <Slider Name="PopularityToSlider" Maximum="100" Minimum="1" TickPlacement="BottomRight" TickFrequency="1" Width="206" Thumb.DragDelta="Slider_DragDelta_33" />
+                            <TextBlock Name="PopularitySliderToTextBlock" Text="1" Margin="5, 0, 0, 0" />
+                            <TextBlock Text="%" Margin="1, 0, 0, 0" />
+                        </StackPanel>
+                    </StackPanel>
+                        <StackPanel Width="84">
+                            <CheckBox x:Name="BindPopularityCheckBox" Content="Bind &#xa;popularity" VerticalContentAlignment="Center" HorizontalContentAlignment="Center" HorizontalAlignment="Center"  VerticalAlignment="Center" Margin = "0,25,0,0" Checked="AnyCheckBoxAction"  Unchecked="AnyCheckBoxAction"/>
                         </StackPanel>
                     </StackPanel>
                 </GroupBox>
                 <GroupBox Header="Your choices">
-                    <StackPanel Height="100" Margin="10,0,0,0">
-                        <TextBlock x:Name="ChoicesTextBlock" />
+                    <StackPanel Name="StackPanelForChoices" Height="160" Margin="10,0,0,0">
+                        
                     </StackPanel>
                 </GroupBox>
 
